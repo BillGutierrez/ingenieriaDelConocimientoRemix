@@ -9,6 +9,7 @@ from django.core.management import call_command
 from rest_framework.test import APIClient
 
 from .inference import CLASS_NAMES, DishPrediction, predict_dish
+from .management.commands.seed_dishes import RECIPES
 from .models import Dish, DishIngredient, Ingredient
 
 
@@ -130,6 +131,8 @@ class PublicCatalogPageTests(TestCase):
         self.assertContains(response, "Sabores del Perú")
         self.assertContains(response, "Identificar un platillo")
         self.assertContains(response, "Ceviche")
+        self.assertContains(response, "COSTA · SIERRA · SELVA")
+        self.assertContains(response, "no representa por igual")
         self.assertEqual(response.context["dish_count"], 40)
 
     def test_model_class_order_matches_catalog(self):
@@ -185,3 +188,45 @@ class PublicCatalogPageTests(TestCase):
         call_command("seed_dishes", verbosity=0)
 
         self.assertEqual(Dish.objects.count(), 40)
+
+    def test_seeded_regions_use_the_current_three_regions_or_diverse(self):
+        valid_regions = {value for value, _ in Dish.Region.choices}
+
+        self.assertEqual(
+            valid_regions,
+            {"costa", "sierra", "selva", "diversas"},
+        )
+        self.assertTrue(
+            all(recipe[1] in valid_regions for recipe in RECIPES.values())
+        )
+        self.assertFalse(
+            Dish.objects.filter(region__in=["andes", "lima_chifa"]).exists()
+        )
+
+    def test_seed_marks_alternative_ingredients_as_optional(self):
+        for dish_name, ingredient_name in (
+            ("Escabeche", "pollo"),
+            ("Escabeche", "pescado"),
+            ("Olluquito", "carne de res"),
+            ("Olluquito", "charqui"),
+            ("Tallarin Saltado", "carne de res"),
+            ("Tallarin Saltado", "pollo"),
+            ("Tacu Tacu", "bistec"),
+            ("Tallarines Rojos", "pollo"),
+            ("Tallarines Verdes", "bistec"),
+            ("Humitas", "anís"),
+        ):
+            relation = DishIngredient.objects.get(
+                dish__name=dish_name,
+                ingredient__name=ingredient_name,
+            )
+            self.assertTrue(relation.is_optional, (dish_name, ingredient_name))
+            self.assertTrue(relation.notes)
+
+    def test_description_ingredients_are_present_in_the_seed(self):
+        self.assertTrue(
+            DishIngredient.objects.filter(
+                dish__name="Caldo de Gallina",
+                ingredient__name="limón",
+            ).exists()
+        )

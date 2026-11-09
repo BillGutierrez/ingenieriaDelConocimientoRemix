@@ -4,8 +4,8 @@ from django.db import models
 class Dish(models.Model):
     class Region(models.TextChoices):
         COSTA = "costa", "Costa"
-        ANDES = "andes", "Andes"
-        LIMA_CHIFA = "lima_chifa", "Lima y cocina chifa"
+        SIERRA = "sierra", "Sierra"
+        SELVA = "selva", "Selva"
         DIVERSAS = "diversas", "Varias regiones"
 
     name = models.CharField("nombre", max_length=120, unique=True)

@@ -26,7 +26,7 @@ La instalación de `backend/requirements.txt` incluye LiteRT para ejecutar la in
 
 Abre `http://127.0.0.1:8000/` para el sitio, `http://127.0.0.1:8000/api/` para la API y `http://127.0.0.1:8000/admin/` para administrar el catálogo.
 
-`seed_dishes` carga los 40 nombres exactos de las categorías de PeruFoodNet y sus ingredientes típicos de referencia. Se puede volver a ejecutar sin duplicar registros y no elimina otros datos. Algunas preparaciones tienen variantes regionales o familiares; revisa y completa las fichas desde Admin antes de publicarlas. Las fuentes enlazadas se incluyen cuando se verificó una receta concreta.
+`seed_dishes` carga los 40 nombres exactos de las categorías de PeruFoodNet y sus ingredientes típicos de referencia. Las regiones se clasifican como Costa, Sierra, Selva o Varias regiones; platos de Lima y de tradición chifa se ubican en Costa, no son regiones independientes. Esta selección no representa por igual todas las cocinas regionales del Perú. Se puede volver a ejecutar el comando sin duplicar registros y no elimina otros datos. Algunas preparaciones tienen variantes; cuando los ingredientes son alternativas se marcan como opcionales y se aclaran en sus notas. Revisa las fichas y fuentes desde Admin antes de publicarlas.
 
 ## Endpoints iniciales
 
@@ -60,7 +60,7 @@ El repositorio incluye `render.yaml` para desplegar el contenedor en Render Free
 1. Crea un proyecto PostgreSQL en Neon. Escoge una región cercana a Oregon, donde se configura el servicio de Render.
 2. En la página de conexión de Neon, copia la URL de conexión PostgreSQL (con SSL). Trátala como contraseña: no la subas a Git ni la publiques.
 3. En Render, crea un **Blueprint** desde el repositorio de GitHub. Render detectará el `render.yaml`; cuando solicite `DATABASE_URL`, pega la URL de Neon como variable secreta.
-4. Espera a que termine el despliegue. Al iniciar, el contenedor aplica migraciones y carga el catálogo de los 40 platillos. Render comprobará `/api/health/`.
+4. Espera a que termine el despliegue. Al iniciar, el contenedor aplica migraciones y carga el catálogo de los 40 platillos. La migración normaliza los valores de región antiguos (`lima_chifa` y `andes`) sin borrar platillos ni ingredientes. Render comprobará `/api/health/`.
 5. Abre la URL `onrender.com` que Render asigne. Comprueba el catálogo y prueba una imagen desde la página principal.
 
 El Blueprint genera `DJANGO_SECRET_KEY` de forma privada y configura HTTPS, hosts y CSRF para el subdominio de Render. Para administrar datos en producción, usa Django Admin creando un superusuario mediante Shell de Render (`python manage.py createsuperuser`). Haz copias de seguridad periódicas de la base Neon y revisa sus cuotas gratuitas vigentes.
