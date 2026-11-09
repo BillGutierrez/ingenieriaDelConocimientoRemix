@@ -141,7 +141,15 @@ Los datos y experimentos generados se excluyen del control de versiones mediante
 
 ## Autoría y referencia académica
 
-- **Autor:** Gutierrez Vega Bill Toño — 2012100229F
+- **Autores:** 
+
+| Nombre | Código |
+|---|---|
+| Gutierrez Vega Bill Toño | 2012100229F |
+| Gutierrez Vega Bill Toño | 2012100229F |
+| Gutierrez Vega Bill Toño | 2012100229F |
+| Gutierrez Vega Bill Toño | 2012100229F |
+
 - **Curso:** Ingeniería del Conocimiento (IS056B)
 - **Docente:** Msc. Jaime Antonio Huaytalla Pariona
 - **Institución:** Universidad Nacional del Centro del Perú (UNCP)
