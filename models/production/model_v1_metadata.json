@@ -1,0 +1,43 @@
+{
+  "model": {
+    "name": "Transfer Learning - EfficientNetB0 (Fase 1)",
+    "architecture": "EfficientNetB0 + GAP + Dense(256) + Dropout(0.5) + Dense(40)",
+    "total_params": 4000000,
+    "trainable_params": "Solo la cabeza clasificadora (base congelada)",
+    "input_shape": [
+      224,
+      224,
+      3
+    ],
+    "output_classes": 40
+  },
+  "training": {
+    "best_val_loss": 0.8516,
+    "best_val_acc": 0.9783,
+    "test_acc": 0.97,
+    "test_f1_macro": 0.9698940683272539,
+    "final_epoch": 10,
+    "optimizer": "Adam",
+    "learning_rate": 0.001,
+    "batch_size": 32,
+    "label_smoothing": 0.1
+  },
+  "dataset": {
+    "name": "PeruFoodNet",
+    "source": "Mendeley Data (DOI: 10.17632/hxhbbm497d.3)",
+    "total_images": 4000,
+    "classes": 40,
+    "images_per_class": 100,
+    "train_split": 0.7,
+    "val_split": 0.15,
+    "test_split": 0.15
+  },
+  "environment": {
+    "python_version": "3.11.0",
+    "keras_version": "3.15.1",
+    "backend": "torch",
+    "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+    "os": "Windows 10"
+  },
+  "fecha_entrenamiento": "2026-11-08 23:09:18"
+}

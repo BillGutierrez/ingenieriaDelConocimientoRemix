@@ -1,0 +1,52 @@
+{% extends "catalog/base.html" %}
+
+{% block title %}{{ dish.name }} — Mesa Peruana{% endblock %}
+
+{% block content %}
+<div class="detail-page">
+  <div class="breadcrumb"><a href="{% url 'catalog_pages:home' %}">Inicio</a><span>/</span><a href="{% url 'catalog_pages:home' %}#platillos">Platillos</a><span>/</span><strong>{{ dish.name }}</strong></div>
+  {% if prediction %}
+  <aside class="prediction-result" role="status">
+    <span class="eyebrow"><span class="eyebrow-dot"></span> RESULTADO DE TU FOTO</span>
+    <p>El modelo reconoce este platillo como <strong>{{ dish.name }}</strong>.</p>
+    <span class="prediction-confidence">Puntuación del modelo: {{ prediction.confidence|floatformat:0 }}%</span>
+    <small>Es una estimación, no una garantía de que la imagen corresponda a este plato.</small>
+  </aside>
+  {% endif %}
+  <section class="detail-hero">
+    <div class="detail-copy">
+      <span class="eyebrow"><span class="eyebrow-dot"></span> {{ dish.get_region_display|upper }} · RECETARIO PERUANO</span>
+      <h1>{{ dish.name }}<span class="accent">.</span></h1>
+      <p>{{ dish.description }}</p>
+      <a class="button button-dark" href="#ingredientes">Conocer sus ingredientes <span aria-hidden="true">↓</span></a>
+    </div>
+    <div class="detail-plate" aria-hidden="true">
+      <div class="plate-rim"><div class="plate-center"><span>{{ dish.emoji }}</span><small>HECHO CON HISTORIA</small></div></div>
+      <span class="plate-star star-a">✳</span><span class="plate-star star-b">✳</span>
+    </div>
+  </section>
+
+  <section class="ingredient-section" id="ingredientes">
+    <div class="ingredient-heading">
+      <div><span class="eyebrow">LO QUE VA EN LA MESA</span><h2>Ingredientes habituales</h2></div>
+      <span class="ingredient-total">{{ dish.dish_ingredients.count }} EN TOTAL</span>
+    </div>
+    <p class="ingredient-lead">Una guía para conocer la receta tradicional. Las cantidades y los ingredientes pueden cambiar según la región y quien cocina.</p>
+    <div class="ingredient-grid">
+      {% for item in dish.dish_ingredients.all %}
+      <article class="ingredient-card">
+        <span class="ingredient-index">{{ forloop.counter|stringformat:"02d" }}</span>
+        <div><h3>{{ item.ingredient.name|title }}{% if item.is_optional %}<span class="optional-tag">OPCIONAL</span>{% endif %}</h3>
+        {% if item.ingredient.description %}<p>{{ item.ingredient.description }}</p>{% endif %}
+        {% if item.notes %}<small>{{ item.notes }}</small>{% endif %}</div>
+      </article>
+      {% empty %}
+      <div class="empty-state ingredient-empty"><span aria-hidden="true">✳</span><h3>Pronto añadiremos los ingredientes</h3><p>El catálogo está en preparación.</p></div>
+      {% endfor %}
+    </div>
+    {% if reference_url %}<p class="source-note">Referencia de receta: <a href="{{ reference_url }}" target="_blank" rel="noopener noreferrer">consultar fuente ↗</a></p>{% endif %}
+    <aside class="notice"><span aria-hidden="true">✳</span><p><strong>Una nota importante.</strong> Esta lista describe ingredientes típicos de una receta; no confirma lo que contiene un plato preparado ni debe utilizarse para decidir si es seguro ante alergias o restricciones alimentarias.</p></aside>
+  </section>
+  <div class="back-row"><a class="text-link" href="{% url 'catalog_pages:home' %}#platillos">← Volver a todos los platillos</a><a class="text-link" href="/api/dishes/{{ dish.slug }}/">Ver datos en la API ↗</a></div>
+</div>
+{% endblock %}

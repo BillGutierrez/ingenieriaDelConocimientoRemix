@@ -1,0 +1,43 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#153d35">
+  <meta name="description" content="Un recorrido por los sabores, ingredientes y tradiciones de la cocina peruana.">
+  <link rel="icon" type="image/svg+xml" href="{% static 'catalog/favicon.svg' %}">
+  <title>{% block title %}Mesa Peruana{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'catalog/site.css' %}">
+</head>
+<body>
+  <div class="topline"></div>
+  <header class="site-header">
+    <a class="brand" href="{% url 'catalog_pages:home' %}" aria-label="Mesa Peruana, inicio">
+      <span class="brand-mark">M</span>
+      <span><strong>MESA</strong><small>PERUANA</small></span>
+    </a>
+    <nav class="main-nav" aria-label="Navegación principal">
+      <a href="{% url 'catalog_pages:home' %}#platillos">Platillos</a>
+      <a href="{% url 'catalog_pages:home' %}#historia">Nuestra mesa</a>
+      <a class="nav-cta" href="/api/dishes/">Explorar API <span aria-hidden="true">↗</span></a>
+    </nav>
+  </header>
+  <main>
+    {% if messages %}
+    <div class="page-messages" role="status" aria-live="polite">
+      {% for message in messages %}<p>{{ message }}</p>{% endfor %}
+    </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="site-footer">
+    <a class="brand brand-footer" href="{% url 'catalog_pages:home' %}">
+      <span class="brand-mark">M</span>
+      <span><strong>MESA</strong><small>PERUANA</small></span>
+    </a>
+    <p>Un homenaje a la diversidad que se sirve en las mesas del Perú.</p>
+    <span class="footer-note">Ingredientes referenciales · Las recetas varían</span>
+  </footer>
+</body>
+</html>

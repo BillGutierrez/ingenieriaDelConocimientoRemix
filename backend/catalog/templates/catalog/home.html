@@ -1,0 +1,118 @@
+{% extends "catalog/base.html" %}
+
+{% block title %}Mesa Peruana — Sabores que cuentan historias{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-grain" aria-hidden="true"></div>
+  <div class="hero-copy">
+    <span class="eyebrow eyebrow-light"><span class="eyebrow-dot"></span> UN VIAJE POR EL PERÚ, BOCADO A BOCADO</span>
+    <h1>En cada plato,<br><em>una historia.</em></h1>
+    <p>Descubre los sabores, ingredientes y tradiciones que hacen única a la cocina peruana.</p>
+    <a class="button button-light" href="#identificar">Identificar un platillo <span aria-hidden="true">↓</span></a>
+  </div>
+  <div class="hero-art" aria-hidden="true">
+    <div class="hero-orbit orbit-one"></div>
+    <div class="hero-orbit orbit-two"></div>
+    <div class="hero-seal"><span>COCINA</span><strong>PERÚ</strong><span>DESDE EL CORAZÓN</span></div>
+    <span class="hero-leaf leaf-one">✳</span><span class="hero-leaf leaf-two">✳</span>
+    <span class="hero-plate">✺</span>
+  </div>
+  <div class="hero-foot"><span>03 REGIONES · INFINITAS HISTORIAS</span><span>LIMA · ANDES · COSTA</span></div>
+</section>
+
+<section class="classifier-section" id="identificar">
+  <div class="classifier-copy">
+    <span class="eyebrow"><span class="eyebrow-dot"></span> ¿QUÉ HAY EN TU PLATO?</span>
+    <h2>Una foto, un sabor por descubrir<span class="accent">.</span></h2>
+    <p>Sube una imagen y nuestro modelo buscará el platillo peruano más parecido entre las 40 categorías de PeruFoodNet.</p>
+    <span class="classifier-note">La predicción es orientativa; el modelo puede equivocarse.</span>
+  </div>
+  <form class="classifier-form" method="post" action="{% url 'catalog_pages:classify_dish' %}" enctype="multipart/form-data">
+    {% csrf_token %}
+    <label class="upload-label" for="{{ image_form.image.id_for_label }}">Elige una foto del platillo</label>
+    {{ image_form.image }}
+    {% if image_form.image.help_text %}<span class="upload-help">{{ image_form.image.help_text }}</span>{% endif %}
+    {% for error in image_form.image.errors %}<span class="form-error">{{ error }}</span>{% endfor %}
+    {% for error in image_form.non_field_errors %}<span class="form-error">{{ error }}</span>{% endfor %}
+    <button class="button button-dark" type="submit">Reconocer platillo <span aria-hidden="true">↗</span></button>
+    <span class="privacy-note">La imagen se procesa durante la solicitud y no se conserva después.</span>
+  </form>
+</section>
+
+<section class="intro section-wrap" id="historia">
+  <div class="intro-label"><span class="eyebrow">MÁS QUE UNA RECETA</span><span class="intro-rule"></span></div>
+  <div class="intro-main">
+    <h2>Una mesa que reúne<br>al Perú entero<span class="accent">.</span></h2>
+    <p>De la costa al mundo andino, cada receta guarda una forma de compartir. Conoce los platos del dataset PeruFoodNet y sus ingredientes habituales, con espacio para las variantes de cada hogar.</p>
+    <div class="stats">
+      <div><strong>{{ dish_count|stringformat:"02d" }}</strong><span>PLATILLOS</span></div>
+      <div><strong>{{ ingredient_count|stringformat:"02d" }}</strong><span>INGREDIENTES</span></div>
+      <div><strong>01</strong><span>GRAN TRADICIÓN</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="collection" id="platillos">
+  <div class="section-wrap">
+    <div class="collection-heading">
+      <div>
+        <span class="eyebrow">EL RECETARIO</span>
+        <h2>Sabores del Perú</h2>
+        <p class="collection-subtitle">Un catálogo para mirar de cerca lo que nos reúne.</p>
+      </div>
+      <span class="collection-count">{{ dish_count }} PLATILLOS</span>
+    </div>
+    <form class="search-form" method="get" action="{% url 'catalog_pages:home' %}" role="search">
+      <label class="search-box">
+        <span aria-hidden="true" class="search-icon">⌕</span>
+        <span class="visually-hidden">Buscar un platillo o ingrediente</span>
+        <input type="search" name="q" value="{{ query }}" placeholder="Busca un platillo o ingrediente…" autocomplete="off">
+      </label>
+      <button class="button button-dark" type="submit">Buscar <span aria-hidden="true">↗</span></button>
+      {% if query %}<a class="clear-search" href="{% url 'catalog_pages:home' %}">Limpiar</a>{% endif %}
+    </form>
+
+    {% if query %}
+      <p class="results-label">Resultados para “{{ query }}” <span>({{ dishes|length }})</span></p>
+    {% endif %}
+
+    <div class="dish-grid">
+      {% for dish in dishes %}
+      <article class="dish-card">
+        <a class="dish-card-link" href="{% url 'catalog_pages:dish_detail' dish.slug %}">
+          <div class="dish-visual visual-{{ forloop.counter0|divisibleby:4|yesno:'one,two' }}">
+            <span class="dish-number">{{ forloop.counter|stringformat:"02d" }}</span>
+            <span class="dish-emoji" aria-hidden="true">{{ dish.emoji }}</span>
+            <span class="visual-caption">COCINA PERUANA</span>
+          </div>
+          <div class="dish-card-body">
+            <div class="dish-meta"><span>{{ dish.get_region_display }}</span><span>{{ dish.ingredient_count }} ingredientes</span></div>
+            <h3>{{ dish.name }}</h3>
+            <p>{{ dish.description|truncatechars:105 }}</p>
+            <span class="card-arrow" aria-label="Ver {{ dish.name }}">↗</span>
+          </div>
+        </a>
+      </article>
+      {% empty %}
+      <div class="empty-state">
+        <span aria-hidden="true">✳</span>
+        {% if query %}
+          <h3>No encontramos ese sabor</h3>
+          <p>Prueba con otro nombre de platillo o ingrediente.</p>
+        {% else %}
+          <h3>La mesa se está preparando</h3>
+          <p>Agrega los platillos desde el panel de administración para llenar el catálogo.</p>
+          <a class="text-link" href="/admin/">Abrir administración ↗</a>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="closing-banner">
+  <span class="eyebrow eyebrow-light">UN SABOR NO TIENE UNA SOLA HISTORIA</span>
+  <p>Los ingredientes aquí descritos son <em>habituales y referenciales</em>. Cada familia, región y cocina tiene su propia versión.</p>
+</section>
+{% endblock %}
