@@ -9,6 +9,7 @@
   <link rel="icon" type="image/svg+xml" href="{% static 'catalog/favicon.svg' %}">
   <title>{% block title %}Mesa Peruana{% endblock %}</title>
   <link rel="stylesheet" href="{% static 'catalog/site.css' %}">
+  <script src="{% static 'catalog/site.js' %}" defer></script>
 </head>
 <body>
   <div class="topline"></div>
@@ -37,7 +38,15 @@
       <span><strong>MESA</strong><small>PERUANA</small></span>
     </a>
     <p>Un homenaje a la diversidad que se sirve en las mesas del Perú.</p>
-    <span class="footer-note">Ingredientes referenciales · Las recetas varían</span>
+    <button class="footer-note easter-egg-trigger" type="button" data-clicks-needed="7" aria-label="Ingredientes referenciales. Las recetas varían.">
+      Ingredientes referenciales · Las recetas varían
+    </button>
   </footer>
+  <dialog class="love-dialog" id="love-note" aria-labelledby="love-note-message">
+    <div class="love-dialog-content">
+      <p id="love-note-message">Te amo &lt;# D</p>
+      <form method="dialog"><button class="button button-dark" type="submit">Cerrar</button></form>
+    </div>
+  </dialog>
 </body>
 </html>

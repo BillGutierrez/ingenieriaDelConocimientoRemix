@@ -25,19 +25,21 @@ Se utiliza **PeruFoodNet**, publicado en Mendeley Data:
 - [Página del dataset](https://data.mendeley.com/datasets/hxhbbm497d/3)
 - DOI: [10.17632/hxhbbm497d.3](https://doi.org/10.17632/hxhbbm497d.3)
 
-Descarga y descomprime el dataset. **La celda de carga del notebook actualmente busca una carpeta llamada `Dataset_PeruFoodNet` en la raíz del proyecto**, con una subcarpeta por clase:
+Descarga y descomprime el dataset. **La celda de carga del notebook busca la carpeta `data/raw/Dataset_PeruFoodNet/`**, con una subcarpeta por clase:
 
 ```text
 proyecto_comida/
-├── Dataset_PeruFoodNet/
-│   ├── Anticuchos/
-│   ├── Ceviche/
-│   └── ... una carpeta por clase
+├── data/
+│   └── raw/
+│       └── Dataset_PeruFoodNet/
+│           ├── Anticuchos/
+│           ├── Ceviche/
+│           └── ... una carpeta por clase
 ├── comida_peru.ipynb
 └── requirements.txt
 ```
 
-Aunque también exista `data/raw/` en el proyecto, la ruta de lectura definida actualmente en el notebook es la carpeta de la raíz. Cada clase debe contener sus imágenes.
+Cada carpeta de clase debe contener sus imágenes. Los datos no se incluyen en el repositorio; descárgalos desde la fuente y colócalos en esa ruta antes de ejecutar el notebook.
 
 ## Modelos y metodología
 
@@ -94,7 +96,7 @@ python -c "import keras, torch; print('Keras:', keras.__version__, '| backend:',
 
 ## Ejecución
 
-1. Coloca el dataset en `Dataset_PeruFoodNet/` en la raíz, según la estructura anterior.
+1. Coloca el dataset en `data/raw/Dataset_PeruFoodNet/`, según la estructura anterior.
 2. Abre `comida_peru.ipynb` en VS Code o Jupyter y selecciona el kernel `.venv`.
 3. Ejecuta las celdas en orden. La primera fase de carga valida la presencia y distribución del dataset; el entrenamiento puede tardar y requiere memoria considerable.
 4. Los resultados del entrenamiento, modelos y metadatos se guardan bajo `experimentos/` y `models/production/`, respectivamente.

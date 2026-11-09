@@ -133,6 +133,8 @@ class PublicCatalogPageTests(TestCase):
         self.assertContains(response, "Ceviche")
         self.assertContains(response, "COSTA · SIERRA · SELVA")
         self.assertContains(response, "no representa por igual")
+        self.assertContains(response, 'data-clicks-needed="7"')
+        self.assertContains(response, "Te amo &lt;# D")
         self.assertEqual(response.context["dish_count"], 40)
 
     def test_model_class_order_matches_catalog(self):
