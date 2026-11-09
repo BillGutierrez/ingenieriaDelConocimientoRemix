@@ -22,11 +22,24 @@ class ImagePredictionTests(TestCase):
     @patch("catalog.inference._load_model")
     def test_prediction_prepares_image_and_selects_highest_scoring_class(self, load_model):
         class FakeModel:
-            def predict(self, batch, verbose):
+            def get_input_details(self):
+                return [{"index": 1}]
+
+            def get_output_details(self):
+                return [{"index": 2}]
+
+            def set_tensor(self, index, batch):
                 self.batch = batch
+                self.input_index = index
+
+            def invoke(self):
                 scores = np.zeros((1, len(CLASS_NAMES)), dtype=np.float32)
                 scores[0, 12] = 0.9
-                return scores
+                self.scores = scores
+
+            def get_tensor(self, index):
+                self.output_index = index
+                return self.scores
 
         model = FakeModel()
         load_model.return_value = model
@@ -38,6 +51,8 @@ class ImagePredictionTests(TestCase):
         self.assertEqual(model.batch.shape, (1, 224, 224, 3))
         self.assertGreaterEqual(float(model.batch.min()), 0)
         self.assertLessEqual(float(model.batch.max()), 1)
+        self.assertEqual(model.input_index, 1)
+        self.assertEqual(model.output_index, 2)
 
 
 class CatalogApiTests(TestCase):

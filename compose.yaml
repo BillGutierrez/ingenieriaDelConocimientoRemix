@@ -7,7 +7,7 @@ services:
       - .env
     environment:
       DJANGO_DATABASE_PATH: /data/db.sqlite3
-      PERUFOODNET_MODEL_PATH: /app/models/production/model_v1.keras
+      PERUFOODNET_MODEL_PATH: /app/models/production/model_v1.tflite
     volumes:
       - catalog_data:/data
     expose:

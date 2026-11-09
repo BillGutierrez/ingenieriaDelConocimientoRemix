@@ -107,6 +107,8 @@ La carpeta temporal de logs cambia entre sesiones. Si TensorBoard muestra **“N
 
 El backend en [`backend/`](./backend/) ofrece un sitio Django para explorar los 40 platillos de PeruFoodNet, buscar por platillo o ingrediente y consultar fichas gastronómicas. En la página principal se puede subir una fotografía: el modelo EfficientNetB0 predice la clase y dirige a la ficha correspondiente. La imagen se procesa durante la solicitud y no se conserva después. DRF expone el catálogo en una API paginada; la predicción está disponible desde el formulario web. El modelo se versiona en `models/production/`. El proyecto incluye Docker Compose y Caddy para desplegar el sitio con HTTPS en una VM ARM64; consulta [`backend/README.md`](./backend/README.md) para las instrucciones.
 
+Para una demostración pública sin administrar una VM, el repositorio incluye un despliegue alternativo en Render Free con PostgreSQL de Neon Free. La aplicación web usa una versión LiteRT cuantizada de aproximadamente 4.9 MB para reducir memoria; el modelo Keras original se mantiene para reproducir el entrenamiento. Render puede suspender el servicio por inactividad, y su sistema de archivos no es persistente. Consulta [`backend/README.md`](./backend/README.md) y `render.yaml` para los pasos y limitaciones.
+
 ## Estructura del proyecto
 
 ```text
@@ -122,11 +124,11 @@ proyecto_comida/
 │   └── training/                # Espacio para código de entrenamiento
 ├── experimentos/                # CSV, JSON y resultados de cada ejecución
 ├── models/
-│   └── production/              # Modelo final y metadatos locales
+│   └── production/              # Modelo Keras, modelo LiteRT para despliegue y metadatos
 └── .gitignore                   # Excluye datos, modelos y artefactos generados
 ```
 
-Los datos, modelos y experimentos generados se excluyen del control de versiones mediante `.gitignore`; es posible que no aparezcan al clonar el repositorio.
+Los datos y experimentos generados se excluyen del control de versiones mediante `.gitignore`. Se versionan explícitamente el modelo Keras de producción, su metadata y el modelo LiteRT compacto usado por el backend.
 
 ## Conclusiones
 

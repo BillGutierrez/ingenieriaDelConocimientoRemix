@@ -18,3 +18,7 @@ comida_peru.ipynb
 comida_peru.py
 README.md
 backend/README.md
+models/*
+!models/production/
+models/production/*
+!models/production/model_v1.tflite

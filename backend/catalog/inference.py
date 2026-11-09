@@ -1,4 +1,5 @@
 import os
+import threading
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
@@ -50,13 +51,9 @@ CLASS_NAMES = (
     "Tamales",
 )
 
-MODEL_PATH = (
-    Path(__file__).resolve().parents[2]
-    / "models"
-    / "production"
-    / "model_v1.keras"
-)
+MODEL_PATH = Path(__file__).resolve().parents[2] / "models" / "production" / "model_v1.tflite"
 INPUT_SIZE = (224, 224)
+_INFERENCE_LOCK = threading.Lock()
 
 
 class PredictionError(Exception):
@@ -77,25 +74,32 @@ def _load_model(model_path: str):
             "No se encontró el modelo de clasificación. Configura PERUFOODNET_MODEL_PATH."
         )
 
-    os.environ["KERAS_BACKEND"] = "torch"
     try:
-        import keras
+        from ai_edge_litert.interpreter import Interpreter
 
-        model = keras.models.load_model(path, compile=False)
-    except (ImportError, OSError, ValueError) as exc:
+        interpreter = Interpreter(model_content=path.read_bytes(), num_threads=2)
+        interpreter.allocate_tensors()
+    except (ImportError, OSError, RuntimeError, ValueError) as exc:
         raise PredictionError(
             "No se pudo cargar el modelo. Verifica el archivo y las dependencias de inferencia."
         ) from exc
 
-    if tuple(model.input_shape[1:]) != (224, 224, 3):
+    input_details = interpreter.get_input_details()
+    output_details = interpreter.get_output_details()
+    if len(input_details) != 1 or tuple(input_details[0]["shape"]) != (1, 224, 224, 3):
         raise PredictionError(
             "El modelo no tiene la forma de entrada esperada (224, 224, 3)."
         )
-    if model.output_shape[-1] != len(CLASS_NAMES):
+    if input_details[0]["dtype"] != np.float32:
+        raise PredictionError("El modelo debe recibir imágenes de tipo float32.")
+    if len(output_details) != 1 or tuple(output_details[0]["shape"]) != (
+        1,
+        len(CLASS_NAMES),
+    ):
         raise PredictionError(
             f"El modelo debe tener {len(CLASS_NAMES)} salidas para coincidir con las etiquetas."
         )
-    return model
+    return interpreter
 
 
 def predict_dish(uploaded_image) -> DishPrediction:
@@ -109,7 +113,12 @@ def predict_dish(uploaded_image) -> DishPrediction:
         batch = np.asarray(image, dtype=np.float32)[None, ...] / 255.0
 
     try:
-        scores = np.asarray(model.predict(batch, verbose=0))
+        with _INFERENCE_LOCK:
+            input_index = model.get_input_details()[0]["index"]
+            output_index = model.get_output_details()[0]["index"]
+            model.set_tensor(input_index, batch)
+            model.invoke()
+            scores = np.asarray(model.get_tensor(output_index))
     except (RuntimeError, ValueError) as exc:
         raise PredictionError("Ocurrió un error al analizar la imagen.") from exc
 

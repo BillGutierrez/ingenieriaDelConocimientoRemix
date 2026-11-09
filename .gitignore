@@ -50,4 +50,5 @@ Thumbs.db
 !models/
 !models/production/
 !models/production/model_v1.keras
+!models/production/model_v1.tflite
 !models/production/model_v1_metadata.json
