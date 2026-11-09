@@ -4,7 +4,7 @@ from unittest.mock import patch
 import numpy as np
 from PIL import Image
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.core.management import call_command
 from rest_framework.test import APIClient
 
@@ -93,6 +93,16 @@ class CatalogApiTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
 
+@override_settings(
+    STORAGES={
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
+)
 class PublicCatalogPageTests(TestCase):
     @classmethod
     def setUpTestData(cls):

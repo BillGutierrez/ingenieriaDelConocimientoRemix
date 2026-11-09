@@ -51,3 +51,36 @@ Para desarrollo se usa SQLite local en `backend/db.sqlite3`, excluida de Git. La
 Las 40 salidas están asociadas al orden alfabético de las carpetas del dataset usado para entrenar. La app comprueba que ese orden coincida con los 40 nombres del catálogo. La puntuación mostrada es una estimación del modelo, no una garantía de reconocimiento.
 
 Para validar la integración, ejecuta `python backend\manage.py test catalog`.
+
+## Despliegue gratuito en Oracle Cloud
+
+La carpeta `deploy/`, el `Dockerfile` y `compose.yaml` preparan el sitio para una VM Linux ARM64. Oracle Cloud ofrece recursos Always Free que, si están disponibles en tu región, superan la RAM medida para la inferencia local. La cuenta y la capacidad de la región dependen de Oracle; verifica las condiciones actuales de Always Free. La aplicación está configurada para un solo worker porque cargar el modelo consume bastante memoria.
+
+1. Crea una VM Ubuntu ARM64 Always Free y permite tráfico TCP entrante por los puertos **80** y **443** en sus reglas de red. Limita el acceso SSH al origen que administra la VM.
+2. Crea un subdominio gratuito en DuckDNS y apunta su registro IPv4 a la dirección pública de la VM.
+3. Instala Docker Engine con el complemento Compose siguiendo la documentación oficial de Docker. En la VM:
+
+   ```bash
+   sudo mkdir -p /opt/perufoodnet
+   sudo chown "$USER":"$USER" /opt/perufoodnet
+   git clone https://github.com/BillGutierrez/ingenieriaDelConocimientoRemix.git /opt/perufoodnet
+   cd /opt/perufoodnet
+   cp .env.example .env
+   chmod 600 .env
+   ```
+
+4. Genera un secreto con `python3 -c "import secrets; print(secrets.token_urlsafe(64))"` y edita `.env`. Sustituye el dominio de ejemplo en `SITE_DOMAIN`, `DJANGO_ALLOWED_HOSTS` y `DJANGO_CSRF_TRUSTED_ORIGINS`; pega el secreto generado en `DJANGO_SECRET_KEY`. No publiques ni compartas el archivo `.env`.
+5. Inicia los servicios:
+
+   ```bash
+   docker compose up -d --build
+   docker compose ps
+   docker compose logs --tail=100 web caddy
+   ```
+
+   La primera compilación descarga PyTorch y puede tardar varios minutos. Caddy solicitará un certificado HTTPS automáticamente cuando el DNS ya apunte a la VM y los puertos 80/443 sean accesibles.
+6. Abre `https://TU-SUBDOMINIO.duckdns.org/`. Para administrar las fichas, crea una cuenta con `docker compose exec web python manage.py createsuperuser`.
+
+La base SQLite y los certificados se guardan en volúmenes persistentes de Docker. El modelo incluido en Git se empaqueta en la imagen. El catálogo se migra y se completa automáticamente al iniciar el servicio. Antes de administrar datos en producción, configura copias de seguridad del volumen `catalog_data`.
+
+El chequeo `manage.py check --deploy` puede advertir que HSTS preload está desactivado. Se deja así para no solicitar la inclusión de un subdominio gratuito compartido; no actives `DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS` ni preload salvo que controles el dominio y comprendas sus implicaciones.
