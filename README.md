@@ -146,9 +146,9 @@ Los datos y experimentos generados se excluyen del control de versiones mediante
 | Nombre | Código |
 |---|---|
 | Gutierrez Vega Bill Toño | 2012100229F |
-| Gutierrez Vega Bill Toño | 2012100229F |
-| Gutierrez Vega Bill Toño | 2012100229F |
-| Gutierrez Vega Bill Toño | 2012100229F |
+| Quispealaya Vera Elias Carlos | 2024200203H |
+| Lopez Granados Karito Dali Yoselyn | 2024200191I |
+| Paredes Huarcaya Jose Michael | 2024101399J |
 
 - **Curso:** Ingeniería del Conocimiento (IS056B)
 - **Docente:** Msc. Jaime Antonio Huaytalla Pariona
