@@ -14,8 +14,8 @@
   "training": {
     "best_val_loss": 0.8516,
     "best_val_acc": 0.9783,
-    "test_acc": 0.97,
-    "test_f1_macro": 0.9698940683272539,
+    "test_acc": 0.9683333333333334,
+    "test_f1_macro": 0.9682404287012144,
     "final_epoch": 10,
     "optimizer": "Adam",
     "learning_rate": 0.001,
@@ -39,5 +39,5 @@
     "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
     "os": "Windows 10"
   },
-  "fecha_entrenamiento": "2026-11-08 23:09:18"
+  "fecha_entrenamiento": "2026-11-10 20:48:39"
 }
